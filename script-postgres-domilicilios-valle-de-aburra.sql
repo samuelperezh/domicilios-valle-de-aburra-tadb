@@ -138,7 +138,7 @@ create table remuneraciones
     bonificacion_agilidad int not null,
     compensacion_nocturna int not null,
     valor_total int not null,
-    fecha_registro timestamp
+    fecha_registro timestamp,
     fecha_actualizacion timestamp
 );
 
