@@ -12,8 +12,9 @@ create database domicilios_valle_db;
 create user domicilios_valle_usr with encrypted password 'domicilios';
 
 -- Asignar privilegios al nuevo usuario solo en la base de datos creada
-grant all privileges on database domicilios_valle_db to domicilios_valle_usr;
-grant all privileges on schema public to domicilios_valle_usr;
+grant create, connect on database domicilios_valle_db to domicilios_valle_usr;
+grant create on schema public to domicilios_valle_usr;
+grant select, insert, update, delete, trigger on all tables in schema public to domicilios_valle_usr;
 
 -- Tabla: municipios
 create table municipios
