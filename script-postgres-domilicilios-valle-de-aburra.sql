@@ -151,3 +151,54 @@ comment on column remuneraciones.compensacion_nocturna is 'Valor de la compensac
 comment on column remuneraciones.valor_total is 'Valor total de la remuneración';
 comment on column remuneraciones.fecha_registro is 'Fecha de registro de la remuneración';
 comment on column remuneraciones.fecha_actualizacion is 'Fecha de actualización de la remuneración';
+
+-- ¿Cuál es el horario más concurrido de domicilios?
+select
+    servicios.hora,
+    count(*) as cantidad_servicios
+from servicios
+group by servicios.hora
+order by cantidad_servicios desc
+limit 1;
+
+-- ¿Cuál es el tipo de domicilio que más hace cada empresa de mensajería?
+select
+    tipos_domicilio.tipo_domicilio,
+    count(*) as cantidad_servicios
+from servicios
+    inner join tipos_domicilio on servicios.tipo_domicilio_id = tipos_domicilio.id
+group by tipos_domicilio.tipo_domicilio
+order by cantidad_servicios desc
+limit 1;
+
+-- ¿Cuál es la cantidad de agentes por medio de transporte y por plataformas?
+-- select 
+--     medios_transporte.medio_transporte,
+--     plataformas.plataforma_domicilio,
+--     count(*) as cantidad_agentes
+-- from agentes
+--     inner join 
+
+-- ¿Cuántos domicilios del tipo medicamentos por día y por municipio?
+select
+    municipios.municipio,
+    servicios.dia,
+    count(*) as cantidad_servicios
+from servicios
+    inner join tipos_domicilio on servicios.tipo_domicilio_id = tipos_domicilio.id
+    inner join hogares on servicios.hogar_id = hogares.hogar
+    inner join municipios on hogares.municipio_id = municipios.id
+where tipos_domicilio.tipo_domicilio = 'Medicamentos'
+group by municipios.municipio, servicios.dia;
+
+-- ¿Cuál es el tipo de pago más frecuente por plataforma de domicilios?
+-- select
+--     plataformas.plataforma_domicilio,
+--     formas_pago.forma_pago,
+--     count(*) as cantidad_servicios
+-- from servicios
+--     inner join formas_pago on servicios.forma_pago_id = formas_pago.id
+--     inner join agentes on servicios.agente_id = agentes.id
+--     inner join plataformas on agentes.plataforma_domicilio_id = plataformas.id
+-- group by formas_pago.forma_pago, plataformas.plataforma_domicilio
+-- order by max(cantidad_servicios) desc;
