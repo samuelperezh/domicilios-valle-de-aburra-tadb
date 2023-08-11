@@ -159,3 +159,261 @@ comment on column remuneraciones.compensacion_nocturna is 'Valor de la compensac
 comment on column remuneraciones.valor_total is 'Valor total de la remuneración';
 comment on column remuneraciones.fecha_registro is 'Fecha de registro de la remuneración';
 comment on column remuneraciones.fecha_actualizacion is 'Fecha de actualización de la remuneración';
+
+-- ***********************
+-- Creación de vistas
+-- ***********************
+
+-- Vista: cantidad de servicios por hora
+create view v_cantidad_servicios_hora as
+select
+    servicios.hora,
+    count(*) as cantidad_servicios
+from servicios
+group by servicios.hora
+order by cantidad_servicios desc;
+
+-- Vista: remuneraciones de los agentes de domicilios con su plataforma y tipo de transporte
+create view v_remuneraciones_agentes as
+select 
+    a.id,
+    p.plataforma_domicilio,
+    mt.medio_transporte,
+    r.cargo_causado,
+    r.bonificacion_agilidad,
+    r.compensacion_nocturna,
+    r.valor_total,
+    r.fecha_registro,
+    r.fecha_actualizacion
+from remuneraciones r
+    inner join servicios s on r.servicio_id = s.id  
+    inner join agentes a on s.agente_id = a.id
+    inner join plataformas p on a.plataforma_domicilio_id = p.id
+    inner join medios_transporte mt on a.medio_transporte_id = mt.id;
+
+-- Vista: cantidad de servicios por formas de pago en plataformas de domicilios
+create view v_cantidad_servicios_formas_pago_plataformas as
+select
+    p.plataforma_domicilio,
+    fp.forma_pago,
+    count(*) as cantidad_servicios
+from servicios s
+    inner join agentes a on s.agente_id = a.id
+    inner join plataformas p on a.plataforma_domicilio_id = p.id
+    inner join formas_pago fp on s.forma_pago_id = fp.id
+group by p.plataforma_domicilio, fp.forma_pago;
+
+-- Vista: cantidad de servicios por municipio
+create view v_cantidad_servicios_municipio as
+select
+    municipios.municipio,
+    count(*) as cantidad_servicios
+from servicios
+    inner join hogares on servicios.hogar_id = hogares.hogar
+    inner join municipios on hogares.municipio_id = municipios.id
+group by municipios.municipio;
+
+-- ***********************
+-- Creación de funciones
+-- ***********************
+
+-- Función: calcular el cargo causado (valor del servicio multiplicado por el 1%)
+create or replace function f_calcular_cargo_causado(p_servicio_id int)
+returns int as $$
+declare
+    l_total_registros int :=0;
+    l_cargo_causado int :=0;
+begin
+    select count(valor) into l_total_registros 
+    from servicios
+    where id = p_servicio_id;
+
+    if(l_total_registros>0) then
+        select valor into l_cargo_causado
+        from servicios
+        where id = p_servicio_id;
+    end if;
+
+    return l_cargo_causado * 0.01;
+end;
+$$ language plpgsql;
+
+-- Ejemplo de uso:
+select f_calcular_cargo_causado(1);
+
+-- Función: Bonificación por agilidad: Cero en caso de no aplicar
+-- Si el servicio se realizó en menos de 15 minutos, se le dará una bonificación adicional de $5.000
+create or replace function f_calcular_bonificacion_agilidad(p_servicio_id int)
+returns int as $$
+declare
+    l_total_registros int :=0;
+    l_bonificacion_agilidad int :=0;
+    l_duracion_minutos int :=0;
+begin
+    select count(duracion_minutos) into l_total_registros 
+    from servicios
+    where id = p_servicio_id;
+
+    if(l_total_registros>0) then
+        select duracion_minutos into l_duracion_minutos
+        from servicios
+        where id = p_servicio_id;
+
+        if l_duracion_minutos < 15 then
+            l_bonificacion_agilidad = 5000;
+        else
+            l_bonificacion_agilidad = 0;
+        end if;
+    end if;
+    return l_bonificacion_agilidad;
+end;
+$$ language plpgsql;
+
+-- Ejemplo de uso:
+select f_calcular_bonificacion_agilidad(17);
+select duracion_minutos from servicios where id = 17;
+
+-- Función: Compensación nocturna: Cero en caso de no aplicar
+-- Si el servicio se realizó entre las 8:00 p.m. y las 6:00 a.m., se le dará una compensación adicional de $10.000
+create or replace function f_calcular_compensacion_nocturna(p_servicio_id int)
+returns int as $$
+declare
+    l_total_registros int :=0;
+    l_compensacion_nocturna int :=0;
+    l_hora int :=0;
+begin
+    select count(hora) into l_total_registros 
+    from servicios
+    where id = p_servicio_id;
+
+    if(l_total_registros>0) then
+        select hora into l_hora
+        from servicios
+        where id = p_servicio_id;
+
+        if l_hora between 20 and 23 then
+            l_compensacion_nocturna = 10000;
+        elsif l_hora between 0 and 6 then
+            l_compensacion_nocturna = 10000;
+        else
+            l_compensacion_nocturna = 0;
+        end if;
+    end if;
+    return l_compensacion_nocturna;
+end;
+$$ language plpgsql;
+
+--Ejemplos de uso:
+select f_calcular_compensacion_nocturna(56);
+select hora from servicios where id = 56;
+
+select f_calcular_compensacion_nocturna(0);
+select hora from servicios where id = 0;
+
+select f_calcular_compensacion_nocturna(13);
+select hora from servicios where id = 13;
+
+-- Función: calcular el valor total de la remuneración
+create or replace function f_calcular_total_remuneracion(p_servicio_id int)
+returns int as $$
+declare
+    l_total_registros int :=0;
+    l_valor int :=0;
+    l_cargo_causado int :=0;
+    l_bonificacion_agilidad int :=0;
+    l_compensacion_nocturna int :=0;
+    l_valor_total int :=0;
+begin
+    select count(valor) into l_total_registros 
+    from servicios
+    where id = p_servicio_id;
+
+    if(l_total_registros>0) then
+        select valor into l_valor from servicios where id = p_servicio_id;
+
+        l_cargo_causado = f_calcular_cargo_causado(p_servicio_id);
+        l_bonificacion_agilidad = f_calcular_bonificacion_agilidad(p_servicio_id);
+        l_compensacion_nocturna = f_calcular_compensacion_nocturna(p_servicio_id);
+
+        l_valor_total = l_valor +  l_cargo_causado + l_bonificacion_agilidad + l_compensacion_nocturna;
+    end if;
+    return l_valor_total;
+end;
+$$ language plpgsql;
+
+-- Ejemplo de uso:
+select f_calcular_total_remuneracion(1);
+select valor from servicios where id = 1;
+select f_calcular_cargo_causado(1);
+select f_calcular_bonificacion_agilidad(1);
+select f_calcular_compensacion_nocturna(1);
+
+-- Función: calcular la fecha de registro
+-- La fecha se debe tomar en el mes de Julio, con el día y la hora de la tabla servicios
+create or replace function f_calcular_fecha_registro(p_servicio_id int)
+returns timestamp as $$
+declare
+    l_dia int :=0;
+    l_hora int :=0;
+begin
+    select dia into l_dia from servicios where id = p_servicio_id;
+    select hora into l_hora from servicios where id = p_servicio_id;
+
+    return '2023-07-' || l_dia || ' ' || l_hora || ':00:00';
+end;
+$$ language plpgsql;
+
+-- Ejemplo de uso:
+select f_calcular_fecha_registro(1);
+select dia from servicios where id = 1;
+select hora from servicios where id = 1;
+
+-- Función: calcular la fecha de actualización
+create or replace function f_calcular_fecha_actualizacion()
+returns timestamp as $$
+begin
+    return current_timestamp;
+end;
+$$ language plpgsql;
+
+-- ***********************
+-- Creación de procedimientos
+-- ***********************
+
+-- Procedimiento: calcular la remuneración de todos los agentes
+-- TODO - Añadir la posibilidad de actualizar los registros
+create or replace procedure p_calcular_remuneracion_agentes()
+as $$
+declare
+    l_total_registros int :=0;
+    l_servicio_id int :=0;
+    l_cargo_causado int :=0;
+    l_bonificacion_agilidad int :=0;
+    l_compensacion_nocturna int :=0;
+    l_valor_total int :=0;
+    l_fecha_registro timestamp;
+    l_fecha_actualizacion timestamp;
+begin
+    set timezone='America/Bogota';
+
+    select count(id) into l_total_registros from servicios;
+
+    while l_total_registros > 0 loop
+        select id into l_servicio_id from servicios limit 1 offset l_total_registros - 1;
+
+        l_cargo_causado = f_calcular_cargo_causado(l_servicio_id);
+        l_bonificacion_agilidad = f_calcular_bonificacion_agilidad(l_servicio_id);
+        l_compensacion_nocturna = f_calcular_compensacion_nocturna(l_servicio_id);
+        l_valor_total = f_calcular_total_remuneracion(l_servicio_id);
+        l_fecha_registro = f_calcular_fecha_registro(l_servicio_id);
+        l_fecha_actualizacion = current_timestamp;
+
+        insert into remuneraciones(id, cargo_causado, bonificacion_agilidad, compensacion_nocturna, valor_total, fecha_registro, fecha_actualizacion)
+        values (l_servicio_id, l_cargo_causado, l_bonificacion_agilidad, l_compensacion_nocturna, l_valor_total, l_fecha_registro, l_fecha_actualizacion);
+
+        l_total_registros = l_total_registros - 1;
+    end loop;
+end;
+$$ language plpgsql;
+
+call p_calcular_remuneracion_agentes();

@@ -32,7 +32,7 @@ GRANT CREATE SEQUENCE TO "DOMICILIOS_VALLE_USR" ;
 -- ***********************
 
 -- Se debe establecer el esquema a usar
-alter session set current_schema = DOMICILIOS_VALLE_USR
+alter session set current_schema = DOMICILIOS_VALLE_USR;
 
 -- Tabla: municipios
 create table municipios
@@ -126,7 +126,7 @@ comment on column formas_pago.forma_pago is 'Nombre de la forma de pago';
 -- Tabla: servicios
 create table servicios
 (
-    id number generated always as identity,
+    id number generated always as identity (start with 1 increment by 1),
     hogar_id number not null,
     agente_id number not null,
     tipo_domicilio_id number not null,
