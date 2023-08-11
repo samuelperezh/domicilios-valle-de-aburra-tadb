@@ -152,6 +152,7 @@ comment on column remuneraciones.valor_total is 'Valor total de la remuneración
 comment on column remuneraciones.fecha_registro is 'Fecha de registro de la remuneración';
 comment on column remuneraciones.fecha_actualizacion is 'Fecha de actualización de la remuneración';
 
+---CONSULTAS---
 -- ¿Cuál es el horario más concurrido de domicilios?
 select
     servicios.hora,
@@ -162,22 +163,34 @@ order by cantidad_servicios desc
 limit 1;
 
 -- ¿Cuál es el tipo de domicilio que más hace cada empresa de mensajería?
-select
-    tipos_domicilio.tipo_domicilio,
-    count(*) as cantidad_servicios
-from servicios
-    inner join tipos_domicilio on servicios.tipo_domicilio_id = tipos_domicilio.id
-group by tipos_domicilio.tipo_domicilio
-order by cantidad_servicios desc
-limit 1;
+WITH RankedServices AS ( -- se calcula la cantidad de servicios para cada combinación de plataforma_domicilio
+    -- y tipo_domicilio, y se asigna un rango a cada tipo de domicilio dentro de cada plataforma.
+    SELECT
+        p.plataforma_domicilio,
+        td.tipo_domicilio,
+        COUNT(*) AS cantidad_servicios,
+        RANK() OVER (PARTITION BY p.plataforma_domicilio ORDER BY COUNT(*) DESC) AS rank
+    FROM servicios s
+    INNER JOIN tipos_domicilio td ON s.tipo_domicilio_id = td.id
+    INNER JOIN agentes a ON s.agente_id = a.id
+    INNER JOIN plataformas p ON a.plataforma_domicilio_id = p.id
+    GROUP BY p.plataforma_domicilio, td.tipo_domicilio
+)
+SELECT plataforma_domicilio, tipo_domicilio, cantidad_servicios
+FROM RankedServices
+WHERE rank = 1; --En la consulta principal, seleccionamos los resultados de RankedServices
+-- donde el rango es igual a 1. Esto nos dará solo el tipo de domicilio más realizado en cada plataforma de domicilio.
 
 -- ¿Cuál es la cantidad de agentes por medio de transporte y por plataformas?
--- select 
---     medios_transporte.medio_transporte,
---     plataformas.plataforma_domicilio,
---     count(*) as cantidad_agentes
--- from agentes
---     inner join 
+SELECT
+    mt.medio_transporte,
+    p.plataforma_domicilio,
+    COUNT(a.id) AS cantidad_agentes
+FROM agentes a
+INNER JOIN medios_transporte mt ON a.medio_transporte_id = mt.id
+INNER JOIN plataformas p ON a.plataforma_domicilio_id = p.id
+GROUP BY mt.medio_transporte, p.plataforma_domicilio
+ORDER BY mt.medio_transporte, p.plataforma_domicilio;
 
 -- ¿Cuántos domicilios del tipo medicamentos por día y por municipio?
 select
@@ -192,13 +205,13 @@ where tipos_domicilio.tipo_domicilio = 'Medicamentos'
 group by municipios.municipio, servicios.dia;
 
 -- ¿Cuál es el tipo de pago más frecuente por plataforma de domicilios?
--- select
---     plataformas.plataforma_domicilio,
---     formas_pago.forma_pago,
---     count(*) as cantidad_servicios
--- from servicios
---     inner join formas_pago on servicios.forma_pago_id = formas_pago.id
---     inner join agentes on servicios.agente_id = agentes.id
---     inner join plataformas on agentes.plataforma_domicilio_id = plataformas.id
--- group by formas_pago.forma_pago, plataformas.plataforma_domicilio
--- order by max(cantidad_servicios) desc;
+SELECT
+    p.plataforma_domicilio,
+    fp.forma_pago,
+    COUNT(*) AS cantidad_servicios
+FROM servicios s
+INNER JOIN agentes a ON s.agente_id = a.id
+INNER JOIN plataformas p ON a.plataforma_domicilio_id = p.id
+INNER JOIN formas_pago fp ON s.forma_pago_id = fp.id
+GROUP BY p.plataforma_domicilio, fp.forma_pago
+ORDER BY p.plataforma_domicilio, cantidad_servicios DESC;
