@@ -67,7 +67,9 @@ inner join formas_pago fp on s.forma_pago_id = fp.id
 group by p.plataforma_domicilio, fp.forma_pago
 order by p.plataforma_domicilio, cantidad_servicios desc;
 
+-- ************************************************
 -- Consultas después de ejecutar los procedimientos
+-- ************************************************
 
 -- ¿Cuál(es) agente(s) tuvo/tuvieron la mayor remuneración en el mes y de cuánto fue?
 select
