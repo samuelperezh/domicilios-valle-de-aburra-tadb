@@ -1,0 +1,311 @@
+municipio,dia,cantidad_servicios
+Barbosa,1,13
+Barbosa,2,15
+Barbosa,3,16
+Barbosa,4,13
+Barbosa,5,17
+Barbosa,6,8
+Barbosa,7,17
+Barbosa,8,20
+Barbosa,9,14
+Barbosa,10,13
+Barbosa,11,15
+Barbosa,12,15
+Barbosa,13,14
+Barbosa,14,19
+Barbosa,15,17
+Barbosa,16,10
+Barbosa,17,15
+Barbosa,18,12
+Barbosa,19,17
+Barbosa,20,18
+Barbosa,21,16
+Barbosa,22,15
+Barbosa,23,15
+Barbosa,24,24
+Barbosa,25,15
+Barbosa,26,14
+Barbosa,27,15
+Barbosa,28,17
+Barbosa,29,19
+Barbosa,30,21
+Barbosa,31,17
+Bello,1,15
+Bello,2,15
+Bello,3,18
+Bello,4,22
+Bello,5,12
+Bello,6,22
+Bello,7,16
+Bello,8,21
+Bello,9,12
+Bello,10,9
+Bello,11,17
+Bello,12,9
+Bello,13,16
+Bello,14,13
+Bello,15,9
+Bello,16,9
+Bello,17,19
+Bello,18,16
+Bello,19,21
+Bello,20,23
+Bello,21,17
+Bello,22,14
+Bello,23,19
+Bello,24,16
+Bello,25,12
+Bello,26,16
+Bello,27,12
+Bello,28,12
+Bello,29,17
+Bello,30,11
+Bello,31,11
+Caldas,1,18
+Caldas,2,19
+Caldas,3,20
+Caldas,4,14
+Caldas,5,18
+Caldas,6,17
+Caldas,7,19
+Caldas,8,16
+Caldas,9,13
+Caldas,10,13
+Caldas,11,15
+Caldas,12,22
+Caldas,13,14
+Caldas,14,16
+Caldas,15,16
+Caldas,16,10
+Caldas,17,18
+Caldas,18,13
+Caldas,19,15
+Caldas,20,25
+Caldas,21,17
+Caldas,22,15
+Caldas,23,20
+Caldas,24,12
+Caldas,25,12
+Caldas,26,16
+Caldas,27,15
+Caldas,28,20
+Caldas,29,25
+Caldas,30,18
+Caldas,31,22
+Copacabana,1,13
+Copacabana,2,17
+Copacabana,3,17
+Copacabana,4,18
+Copacabana,5,16
+Copacabana,6,13
+Copacabana,7,16
+Copacabana,8,19
+Copacabana,9,19
+Copacabana,10,16
+Copacabana,11,9
+Copacabana,12,15
+Copacabana,13,19
+Copacabana,14,17
+Copacabana,15,19
+Copacabana,16,17
+Copacabana,17,16
+Copacabana,18,20
+Copacabana,19,19
+Copacabana,20,20
+Copacabana,21,21
+Copacabana,22,11
+Copacabana,23,17
+Copacabana,24,25
+Copacabana,25,15
+Copacabana,26,18
+Copacabana,27,19
+Copacabana,28,24
+Copacabana,29,19
+Copacabana,30,13
+Copacabana,31,18
+Envigado,1,20
+Envigado,2,11
+Envigado,3,16
+Envigado,4,11
+Envigado,5,14
+Envigado,6,14
+Envigado,7,10
+Envigado,8,19
+Envigado,9,22
+Envigado,10,12
+Envigado,11,21
+Envigado,12,21
+Envigado,13,17
+Envigado,14,15
+Envigado,15,11
+Envigado,16,18
+Envigado,17,15
+Envigado,18,17
+Envigado,19,20
+Envigado,20,18
+Envigado,21,16
+Envigado,22,19
+Envigado,23,15
+Envigado,24,18
+Envigado,25,11
+Envigado,26,10
+Envigado,27,17
+Envigado,28,17
+Envigado,29,14
+Envigado,30,12
+Envigado,31,18
+Girardota,1,16
+Girardota,2,10
+Girardota,3,17
+Girardota,4,16
+Girardota,5,13
+Girardota,6,24
+Girardota,7,16
+Girardota,8,24
+Girardota,9,9
+Girardota,10,21
+Girardota,11,19
+Girardota,12,13
+Girardota,13,19
+Girardota,14,27
+Girardota,15,17
+Girardota,16,18
+Girardota,17,20
+Girardota,18,20
+Girardota,19,9
+Girardota,20,15
+Girardota,21,19
+Girardota,22,17
+Girardota,23,22
+Girardota,24,14
+Girardota,25,23
+Girardota,26,18
+Girardota,27,12
+Girardota,28,22
+Girardota,29,20
+Girardota,30,13
+Girardota,31,12
+Itagüí,1,14
+Itagüí,2,17
+Itagüí,3,14
+Itagüí,4,10
+Itagüí,5,15
+Itagüí,6,12
+Itagüí,7,9
+Itagüí,8,9
+Itagüí,9,11
+Itagüí,10,9
+Itagüí,11,7
+Itagüí,12,17
+Itagüí,13,16
+Itagüí,14,13
+Itagüí,15,11
+Itagüí,16,15
+Itagüí,17,13
+Itagüí,18,16
+Itagüí,19,13
+Itagüí,20,11
+Itagüí,21,10
+Itagüí,22,8
+Itagüí,23,8
+Itagüí,24,15
+Itagüí,25,13
+Itagüí,26,7
+Itagüí,27,18
+Itagüí,28,9
+Itagüí,29,12
+Itagüí,30,12
+Itagüí,31,12
+La Estrella,1,15
+La Estrella,2,12
+La Estrella,3,11
+La Estrella,4,17
+La Estrella,5,19
+La Estrella,6,19
+La Estrella,7,23
+La Estrella,8,16
+La Estrella,9,21
+La Estrella,10,10
+La Estrella,11,7
+La Estrella,12,11
+La Estrella,13,23
+La Estrella,14,12
+La Estrella,15,16
+La Estrella,16,15
+La Estrella,17,17
+La Estrella,18,15
+La Estrella,19,14
+La Estrella,20,11
+La Estrella,21,15
+La Estrella,22,13
+La Estrella,23,20
+La Estrella,24,19
+La Estrella,25,14
+La Estrella,26,18
+La Estrella,27,20
+La Estrella,28,15
+La Estrella,29,20
+La Estrella,30,15
+La Estrella,31,18
+Medellín,1,16
+Medellín,2,20
+Medellín,3,19
+Medellín,4,18
+Medellín,5,18
+Medellín,6,11
+Medellín,7,23
+Medellín,8,22
+Medellín,9,17
+Medellín,10,15
+Medellín,11,16
+Medellín,12,13
+Medellín,13,15
+Medellín,14,16
+Medellín,15,12
+Medellín,16,10
+Medellín,17,15
+Medellín,18,20
+Medellín,19,14
+Medellín,20,17
+Medellín,21,18
+Medellín,22,18
+Medellín,23,12
+Medellín,24,15
+Medellín,25,17
+Medellín,26,11
+Medellín,27,9
+Medellín,28,21
+Medellín,29,11
+Medellín,30,12
+Medellín,31,23
+Sabaneta,1,20
+Sabaneta,2,15
+Sabaneta,3,18
+Sabaneta,4,20
+Sabaneta,5,16
+Sabaneta,6,15
+Sabaneta,7,21
+Sabaneta,8,9
+Sabaneta,9,15
+Sabaneta,10,23
+Sabaneta,11,24
+Sabaneta,12,22
+Sabaneta,13,16
+Sabaneta,14,22
+Sabaneta,15,15
+Sabaneta,16,18
+Sabaneta,17,17
+Sabaneta,18,21
+Sabaneta,19,16
+Sabaneta,20,18
+Sabaneta,21,17
+Sabaneta,22,19
+Sabaneta,23,18
+Sabaneta,24,19
+Sabaneta,25,22
+Sabaneta,26,19
+Sabaneta,27,18
+Sabaneta,28,22
+Sabaneta,29,13
+Sabaneta,30,12
+Sabaneta,31,22

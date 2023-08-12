@@ -12,6 +12,7 @@ order by cantidad_servicios desc
 fetch first 1 row only;
 
 -- ¿Cuál es el tipo de domicilio que más hace cada empresa de mensajería?
+-- Para realizar esta consulta SQL se requirió ayuda de ChatGPT.
 with cte as (
     select
         p.plataforma_domicilio,

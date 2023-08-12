@@ -373,6 +373,8 @@ select hora from servicios where id = 1;
 -- ***********************
 
 -- Procedimiento: calcular la remuneración de todos los agentes
+-- Para este procedimiento se utilizó ChatGPT con el fin de buscar una ayuda para
+-- traducir el procedimiento de Postgres a Oracle.
 -- TODO - Añadir la posibilidad de actualizar los registros
 create or replace procedure p_calcular_remuneracion_agentes()
 as $$
