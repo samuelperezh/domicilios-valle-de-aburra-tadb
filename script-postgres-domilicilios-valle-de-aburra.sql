@@ -1,6 +1,6 @@
 -- Script PostgreSQL
 -- Curso de Tópicos Avanzados de base de datos - UPB 202320
--- Luisa María Florez - Samuel Pérez Hurtado
+-- Samuel Pérez Hurtado ID 000459067 - Luisa María Flórez Múnera ID 000449529
 
 -- Proyecto: Servicios de Domicilios en el Valle de Aburrá
 -- Motor de Base de datos: PostgreSQL 15.3 (Trabajado por Luisa María Florez)
