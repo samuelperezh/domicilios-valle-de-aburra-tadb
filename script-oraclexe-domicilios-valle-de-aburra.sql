@@ -154,19 +154,19 @@ comment on column servicios.hora is 'Hora del día en que se realiza el servicio
 -- Tabla: remuneraciones
 create table remuneraciones
 (
-    id number not null,
+    servicio_id number not null,
     cargo_causado number not null,
     bonificacion_agilidad number not null,
     compensacion_nocturna number not null,
     valor_total number not null,
     fecha_registro timestamp,
     fecha_actualizacion timestamp,
-    constraint remuneraciones_pk primary key (id),
-    constraint remuneraciones_servicio_fk foreign key (id) references servicios (id)
+    constraint remuneraciones_pk primary key (servicio_id),
+    constraint remuneraciones_servicio_fk foreign key (servicio_id) references servicios (id)
 );
 
 comment on table remuneraciones is 'Remuneraciones de los agentes de domicilios';
-comment on column remuneraciones.id is 'Código de la remuneración del agente de domicilios';
+comment on column remuneraciones.servicio_id is 'Código del servicio de domicilio';
 comment on column remuneraciones.cargo_causado is 'Valor del cargo causado';
 comment on column remuneraciones.bonificacion_agilidad is 'Valor de la bonificación por agilidad';
 comment on column remuneraciones.compensacion_nocturna is 'Valor de la compensación nocturna';
@@ -190,7 +190,7 @@ order by cantidad_servicios desc;
 -- Vista: remuneraciones de los agentes de domicilios con su plataforma y tipo de transporte
 create view v_remuneraciones_agentes as
 select 
-    a.id,
+    a.id as agente_id,
     p.plataforma_domicilio,
     mt.medio_transporte,
     r.cargo_causado,
@@ -200,7 +200,7 @@ select
     r.fecha_registro,
     r.fecha_actualizacion
 from remuneraciones r
-    inner join servicios s on r.id = s.id  
+    inner join servicios s on r.servicio_id = s.id  
     inner join agentes a on s.agente_id = a.id
     inner join plataformas p on a.plataforma_domicilio_id = p.id
     inner join medios_transporte mt on a.medio_transporte_id = mt.id;
@@ -379,8 +379,10 @@ select hora from servicios where id = 1;
 -- Creación de procedimientos
 -- ***********************
 
--- Procedimiento: calcular la remuneración de todos los agentes
-create or replace procedure p_calcular_remuneracion_agentes
+-- Procedimiento: actualizar e insertar la remuneración de todos los agentes
+-- Para este procedimiento se utilizó ChatGPT con el fin de buscar una ayuda para
+-- traducir la sintaxis del procedimiento de Postgres a Oracle.
+create or replace procedure p_actualiza_inserta_remuneracion_agentes
 as
     l_total_registros number := 0;
     l_servicio_id number := 0;
@@ -390,26 +392,101 @@ as
     l_valor_total number := 0;
     l_fecha_registro timestamp;
     l_fecha_actualizacion timestamp;
+    cursor c_servicios is select id from servicios;
+    r_servicio c_servicios%rowtype;
+    r_remuneracion remuneraciones%rowtype;
 begin
     execute immediate 'alter session set time_zone = ''America/Bogota''';
 
-    select count(id) into l_total_registros from servicios;
+    open c_servicios;
+    loop
+        fetch c_servicios into r_servicio;
+        exit when c_servicios%notfound;
 
-    FOR ids IN (SELECT id FROM servicios) LOOP
-        l_servicio_id := ids.id;
-        
+        select count(servicio_id) into l_total_registros
+        from remuneraciones
+        where servicio_id = r_servicio.id;
+
+        l_servicio_id := r_servicio.id;
         l_cargo_causado := f_calcular_cargo_causado(l_servicio_id);
         l_bonificacion_agilidad := f_calcular_bonificacion_agilidad(l_servicio_id);
         l_compensacion_nocturna := f_calcular_compensacion_nocturna(l_servicio_id);
         l_valor_total := f_calcular_total_remuneracion(l_servicio_id);
         l_fecha_registro := f_calcular_fecha_registro(l_servicio_id);
-        l_fecha_actualizacion := CURRENT_TIMESTAMP;
+        l_fecha_actualizacion := current_timestamp;
 
-        INSERT INTO remuneraciones(id, cargo_causado, bonificacion_agilidad, compensacion_nocturna, valor_total, fecha_registro, fecha_actualizacion)
-        VALUES (l_servicio_id, l_cargo_causado, l_bonificacion_agilidad, l_compensacion_nocturna, l_valor_total, l_fecha_registro, l_fecha_actualizacion);
-    END LOOP;
-end p_calcular_remuneracion_agentes;
+        if (l_total_registros > 0) then
 
+            if (r_remuneracion.cargo_causado != l_cargo_causado or
+                r_remuneracion.compensacion_nocturna != l_compensacion_nocturna or
+                r_remuneracion.bonificacion_agilidad != l_bonificacion_agilidad or
+                r_remuneracion.valor_total != l_valor_total or
+                r_remuneracion.fecha_registro != l_fecha_registro) then
+                update remuneraciones r
+                set r.cargo_causado = l_cargo_causado,
+                    r.bonificacion_agilidad = l_bonificacion_agilidad,
+                    r.compensacion_nocturna = l_compensacion_nocturna,
+                    r.valor_total = l_valor_total,
+                    r.fecha_registro = l_fecha_registro,
+                    r.fecha_actualizacion = l_fecha_actualizacion
+                where r.servicio_id = l_servicio_id;
+            end if;
+        else
+            insert into remuneraciones(servicio_id, cargo_causado, bonificacion_agilidad, compensacion_nocturna, valor_total, fecha_registro, fecha_actualizacion)
+            values (l_servicio_id, l_cargo_causado, l_bonificacion_agilidad, l_compensacion_nocturna, l_valor_total, l_fecha_registro, l_fecha_actualizacion);
+        end if;
+    end loop;
+    close c_servicios;
+end p_actualiza_inserta_remuneracion_agentes;
+
+-- Ejemplo de uso:
 begin
-    p_calcular_remuneracion_agentes;
+    p_actualiza_inserta_remuneracion_agentes;
 end;
+
+-- Procedimiento: actualizar e insertar la remuneración de un agente
+create or replace procedure p_actualiza_inserta_remuneracion_agente(p_servicio_id int)
+as
+    l_total_registros number :=0;
+    l_cargo_causado number :=0;
+    l_bonificacion_agilidad number :=0;
+    l_compensacion_nocturna number :=0;
+    l_valor_total number :=0;
+    l_fecha_registro timestamp;
+    l_fecha_actualizacion timestamp;
+    r_remuneracion remuneraciones%rowtype;
+begin
+    execute immediate 'alter session set time_zone = ''America/Bogota''';
+
+    select count(servicio_id) into l_total_registros
+    from remuneraciones
+    where servicio_id = p_servicio_id;
+
+    l_cargo_causado := f_calcular_cargo_causado(p_servicio_id);
+    l_bonificacion_agilidad := f_calcular_bonificacion_agilidad(p_servicio_id);
+    l_compensacion_nocturna := f_calcular_compensacion_nocturna(p_servicio_id);
+    l_valor_total := f_calcular_total_remuneracion(p_servicio_id);
+    l_fecha_registro := f_calcular_fecha_registro(p_servicio_id);
+    l_fecha_actualizacion := current_timestamp;
+
+    if (l_total_registros>0) then
+        if (r_remuneracion.cargo_causado != l_cargo_causado or
+            r_remuneracion.bonificacion_agilidad != l_bonificacion_agilidad or
+            r_remuneracion.compensacion_nocturna != l_compensacion_nocturna or
+            r_remuneracion.valor_total != l_valor_total or
+            r_remuneracion.fecha_registro != l_fecha_registro) then
+
+            update remuneraciones r
+            set cargo_causado = l_cargo_causado,
+                bonificacion_agilidad = l_bonificacion_agilidad,
+                compensacion_nocturna = l_compensacion_nocturna,
+                valor_total = l_valor_total,
+                fecha_registro = l_fecha_registro,
+                fecha_actualizacion = l_fecha_actualizacion
+            where r.servicio_id = p_servicio_id;
+        end if;
+    else
+        insert into remuneraciones(servicio_id, cargo_causado, bonificacion_agilidad, compensacion_nocturna, valor_total, fecha_registro, fecha_actualizacion)
+        values (p_servicio_id, l_cargo_causado, l_bonificacion_agilidad, l_compensacion_nocturna, l_valor_total, l_fecha_registro, l_fecha_actualizacion);
+    end if;
+end p_actualiza_inserta_remuneracion_agente;

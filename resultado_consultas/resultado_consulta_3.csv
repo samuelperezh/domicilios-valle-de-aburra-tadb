@@ -1,0 +1,16 @@
+medio_transporte,plataforma_domicilio,cantidad_agentes
+Automóvil,De Urgencia,3
+Automóvil,Domicilios ACME,5
+Automóvil,Fast Delivery,10
+Automóvil,Palomas Mensajería S.A.,7
+Automóvil,Turbo Entregas,3
+Bicicleta,De Urgencia,3
+Bicicleta,Domicilios ACME,12
+Bicicleta,Fast Delivery,8
+Bicicleta,Palomas Mensajería S.A.,6
+Bicicleta,Turbo Entregas,7
+Motocicleta,De Urgencia,2
+Motocicleta,Domicilios ACME,7
+Motocicleta,Fast Delivery,4
+Motocicleta,Palomas Mensajería S.A.,8
+Motocicleta,Turbo Entregas,15

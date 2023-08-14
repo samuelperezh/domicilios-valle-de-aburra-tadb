@@ -1,6 +1,6 @@
 -- Script Consultas de ambos motores de bases de datos
 -- Curso de Tópicos Avanzados de base de datos - UPB 202320
---Samuel Pérez Hurtado ID 000459067 - Luisa María Flórez Múnera ID 000449529
+-- Samuel Pérez Hurtado ID 000459067 - Luisa María Flórez Múnera ID 000449529
 
 
 -- 1. ¿Cuál es el horario más concurrido de domicilios?
