@@ -293,7 +293,7 @@ begin
 
         if l_hora between 20 and 23 then
             l_compensacion_nocturna := 10000;
-        elsif l_hora between 0 and 6 then
+        elsif l_hora between 0 and 5 then
             l_compensacion_nocturna := 10000;
         else
             l_compensacion_nocturna := 0;
@@ -324,7 +324,7 @@ declare
     l_compensacion_nocturna int :=0;
     l_valor_total int :=0;
 begin
-    select count(valor) into l_total_registros 
+    select count(valor) into l_total_registros
     from servicios
     where id = p_servicio_id;
 
@@ -335,7 +335,7 @@ begin
         l_bonificacion_agilidad := f_calcular_bonificacion_agilidad(p_servicio_id);
         l_compensacion_nocturna := f_calcular_compensacion_nocturna(p_servicio_id);
 
-        l_valor_total := l_valor +  l_cargo_causado + l_bonificacion_agilidad + l_compensacion_nocturna;
+        l_valor_total := l_cargo_causado + l_bonificacion_agilidad + l_compensacion_nocturna;
     end if;
     return l_valor_total;
 end;
